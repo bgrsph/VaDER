@@ -139,7 +139,7 @@ demoCols <- unique(demoCols)
 
 ##converting the data frame to wider format##
 ##extracting the columns that need to be converted to wider format##
-##selectedCols <- setdiff(colnames(selectedFeatures), demogsAndOthers) --> probably they meant demogs instead of demogs And Others
+##selectedCols <- setdiff(colnames(selectedFeatures), demogsAndOthers) --> @Bugra: probably they meant demogs instead of demogs And Others
 selectedCols <- setdiff(colnames(selectedFeatures), demogs)
 
 convDenovoSelectedDf <- selectedFeatures[,selectedCols]
@@ -149,7 +149,14 @@ copyreshape <- reshapeDf
 
 # baseline features with less than 50% missing value
 baselineFeatures <- reshapeDf[,grep("bl", colnames(reshapeDf), value = TRUE)]
-baselineFeaturesUpd = baselineFeatures[ , -which(colMeans(is.na(baselineFeatures)) > 0.5)]
+baselineFeaturesUpd = baselineFeatures[ , -which(colMeans(is.na(baselineFeatures)) > 0.61)]
+
+# @Bugra: baselineFeatures have AV45.bl with 60.5% of missing values, therefore baselineFeaturesUpd doesn't have AV45.bl
+#missing_percentage <- sum(is.na(baselineFeatures$AV45.bl)) / nrow(baselineFeatures) * 100
+#missing_percentage_upd <- sum(is.na(baselineFeaturesUpd$AV45.bl)) / nrow(baselineFeaturesUpd) * 100
+#print(missing_percentage) ==> 60.5
+#print(missing_percentage_upd) ==> NULL
+
 
 ##removing the columns having more than 50% missing data from the main data frame##
 remove50PercMissingCols <- setdiff(colnames(baselineFeatures),colnames(baselineFeaturesUpd))
@@ -333,10 +340,13 @@ FDGAV45 <- grep("(PTID|FDG.bl|AV45.bl)",colnames(reshapeDf),value = TRUE)
 FDGAV45 <- reshapeDf[,FDGAV45]
 colnames(FDGAV45) <- c("PTID","FDG.bl","AV45.bl")
 
+##@Bugra: 60.5% of AV45.bl data is missing (unlike 2 years ago), therefore exluded early on (lines 150 to 152)
+#Since it's excluded, reshaped dataframe does not have AV45.bl: error. 
+#Solution: all columns with more than 61% of missing data is excluded. 
 ######
 ###################
 
-
+# @Bugra: code is dependent on an external file that doesn't exists
 ####other 68 brain regions 
 #import 68 brain region values
 #EMC_ADNI_FS60_Phenotypes_Desikan_20180219 <- read_excel("~/Documents/PhDWork/BayesianNetworkAD/EMC_ADNI_FS60_Phenotypes_Desikan_20180219.xlsx")
