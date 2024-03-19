@@ -14,8 +14,18 @@ library(readxl)
 library(dplyr)
 library(missForest)
 
+## Setup Instructions for loading ADNIMERGE package ##
+##insert your path to the adnimerge zipfile (Download "Merged ADNI 1/GO2 Packages for R" in the website)
+##pathToAdniMergePackage <- "/Users/bugrasipahioglu/Documents/repo/VaDER/data/ADNI/ADNIMERGE_0.0.1.tar"
+##install.packages("Hmisc")
+##install.packages("/Users/bugrasipahioglu/Documents/repo/VaDER/data/ADNI/ADNIMERGE_0.0.1.tar", repos = NULL, type = "source")
+##library(ADNIMERGE)
+
+
+
 ##extract all the convertors and the de-novo subjects##
-aggDiagnosis <- ddply(adnimerge, .(PTID), summarize, DX = toString(DX))
+## Since there are different summarize functions (from different packages), library explicitly defined
+aggDiagnosis <- ddply(adnimerge, .(PTID), plyr::summarize, DX = toString(DX))
 patientid <- c()
 for(i in 1:nrow(aggDiagnosis)){
   if(grepl("Dementia", aggDiagnosis[i,2])){
@@ -129,7 +139,9 @@ demoCols <- unique(demoCols)
 
 ##converting the data frame to wider format##
 ##extracting the columns that need to be converted to wider format##
-selectedCols <- setdiff(colnames(selectedFeatures), demogsAndOthers)
+##selectedCols <- setdiff(colnames(selectedFeatures), demogsAndOthers) --> probably they meant demogs instead of demogs And Others
+selectedCols <- setdiff(colnames(selectedFeatures), demogs)
+
 convDenovoSelectedDf <- selectedFeatures[,selectedCols]
 reshapeDf = reshape(convDenovoSelectedDf,idvar='PTID.1',timevar="VISCODE",dir='w')
 names(reshapeDf)[names(reshapeDf) == 'PTID.1'] <- 'PTID'
